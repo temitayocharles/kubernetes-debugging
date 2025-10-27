@@ -1,6 +1,6 @@
-# Kubernetes Debugging Labs (replicated from course transcript)
+# Kubernetes Debugging Labs 
 
-This repo replicates the labs from the "Debugging Kubernetes" course using the transcripts you provided. Each scenario has a concise, step-by-step playbook to reproduce the issue, diagnose it, and apply a fix on macOS using kind.
+This repo "Debugging Kubernetes" is a simulation of common problems and errors related to using kubernetes. Each scenario has a concise, step-by-step playbook to reproduce the issue, diagnose it, and apply a fix on macOS using kind.
 
 ## Prerequisites (macOS zsh)
 
