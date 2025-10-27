@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-a
+  labels:
+    app: app-a
+spec:
+  selector:
+    app: app-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-a
+  labels:
+    app: app-a
+spec:
+  selector:
+    matchLabels:
+      app: app-a
+  template:
+    metadata:
+      name: app-a
+      labels:
+        app: app-a
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: container
+          ports:
+            - name: web
+              containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+            failureThreshold: 3
+            periodSeconds: 2
+          command:
+            - sh
+            - -c
+            - |
+              >&2 echo "INFO: Server started at $(date)"
+              sleep infinity
+              while true
+              do nc -l -p 80 -q 1ms -c "echo 'HTTP/1.1 200 OK\n\nHello!'"
+              done
+---
+apiVersion: /v1
+kind: Service
+metadata:
+  name: app-b
+  labels:
+    app: app-b
+spec:
+  selector:
+    app: app-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-b
+  labels:
+    app: app-b
+spec:
+  selector:
+    matchLabels:
+      app: app-b
+  template:
+    metadata:
+      name: app-b
+      labels:
+        app: app-b
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: container
+          ports:
+            - name: web
+              containerPort: 80
+          command:
+            - sh
+            - -c
+            - |
+              >&2 echo "INFO: Server started at $(date)"
+              sleep infinity
+              while true
+              do nc -l -p 80 -q 1ms -c "echo 'HTTP/1.1 200 OK\n\nHello!'"
+              done
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-c
+  labels:
+    app: app-c
+spec:
+  selector:
+    app: app-c
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-c
+  labels:
+    app: app-c
+spec:
+  selector:
+    matchLabels:
+      app: app-c
+  template:
+    metadata:
+      name: app-c
+      labels:
+        app: app-c
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: container
+          ports:
+            - name: web
+              containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+            failureThreshold: 3
+            periodSeconds: 2
+          command:
+            - sh
+            - -c
+            - |
+              >&2 echo "INFO: Server started at $(date)"
+              while true
+              do nc -l -p 80 -q 1ms -c "echo 'HTTP/1.1 200 OK\n\nHello!'"
+              done

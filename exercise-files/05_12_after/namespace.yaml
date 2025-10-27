@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+spec:
+  finalizers:
+    - debugging.k8s.io/fake-finalizer
+metadata:
+  name: delete-me

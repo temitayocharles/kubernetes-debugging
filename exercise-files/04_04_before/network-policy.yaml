@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-b-policy
+  labels:
+    app: app-b
+spec:
+  podSelector:
+    matchLabels:
+      app: app-b
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: app-a

@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"app":"test-app-3"},"name":"test-app-3","namespace":"default"},"spec":{"containers":[{"command":["echo","Hello!"],"image":"busybox","name":"container","resources":{"limits":{"memory":"128Mi"}},"volumeMounts":[{"mountPath":"/tmp","name":"volume"}]}],"tolerations":[{"effect":"NoSchedule","key":"debugging.k8s.io/ready","operator":"Exists"}],"volumes":[{"name":"volume","persistentVolumeClaim":{"claimName":"test-app-3-pvc"}}]}}
+  creationTimestamp: "2024-08-27T16:27:59Z"
+  labels:
+    app: test-app-3
+  name: test-app-3
+  namespace: default
+  resourceVersion: "6086"
+  uid: c023ead2-d6ba-41ac-9892-de9cf96abdd0
+spec:
+  containers:
+  - command:
+    - echo
+    - Hello!
+    image: busybox
+    imagePullPolicy: Always
+    name: container
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        memory: 128Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /tmp
+      name: volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-t7m4p
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoSchedule
+    key: debugging.k8s.io/ready
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: volume
+    persistentVolumeClaim:
+      claimName: test-app-3-pvc
+  - name: kube-api-access-t7m4p
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-08-27T16:37:59Z"
+    message: 'running PreBind plugin "VolumeBinding": binding volumes: context deadline
+      exceeded'
+    reason: SchedulerError
+    status: "False"
+    type: PodScheduled
+  phase: Pending
+  qosClass: Burstable

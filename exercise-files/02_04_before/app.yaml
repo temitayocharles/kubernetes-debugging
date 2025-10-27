@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slow-app
+  labels:
+    app: slow-app
+spec:
+  selector:
+    app: slow-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fast-app
+  labels:
+    app: fast-app
+spec:
+  selector:
+    app: fast-app
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slow-app
+  labels:
+    app: slow-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slow-app
+  template:
+    metadata:
+      name: slow-app
+      labels:
+        app: slow-app
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: web-app
+          livenessProbe:
+            periodSeconds: 1
+            timeoutSeconds: 1
+            failureThreshold: 3
+            terminationGracePeriodSeconds: 1
+            exec:
+              command:
+                - test
+                - -f
+                - /tmp/ready
+          resources:
+            limits:
+              cpu: 1m
+              memory: 16Mi
+          ports:
+            - containerPort: 80
+              name: http
+          command:
+            - bash
+            - -c
+            - |
+              {
+                while true;
+                do
+                  period=$((RANDOM%10))
+                  echo "Sleeping for $period seconds"
+                  sleep "${period}s"
+                  touch /tmp/ready
+                  sleep 1
+                  rm /tmp/ready
+                done;
+              } &
+              while true
+              do
+                { result=$(2>&1 timeout --foreground -s INT 1s dd if=/dev/zero of=/dev/null bs=1 | grep 'copied'); echo -e "HTTP/1.1 200 OK\n\nResult: $result"; } | nc -l -p 80 -q 1ms
+              done
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fast-app
+  labels:
+    app: fast-app
+spec:
+  containers:
+    - image: carlosnunez/ubuntu-with-netcat:noble
+      name: web-app
+      ports:
+        - containerPort: 80
+          name: http
+      command:
+        - bash
+        - -c
+        - |
+          while true;
+          do
+            { result=$(2>&1 timeout --foreground -s INT 1s dd if=/dev/zero of=/dev/null bs=1 | grep 'copied'); echo -e "HTTP/1.1 200 OK\n\nResult: $result"; } | nc -l -p 80 -q 1ms
+          done

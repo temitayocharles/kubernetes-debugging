@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app-1
+  labels:
+    app: test-app-1
+spec:
+  selector:
+    matchLabels:
+      app: test-app-1
+  template:
+    metadata:
+      name: test-app-1
+      labels:
+        app: test-app-1
+    spec:
+      containers:
+        - image: busybox
+          name: container
+          readinessProbe:
+            periodSeconds: 1
+            timeoutSeconds: 1
+            failureThreshold: 3
+            exec:
+              command:
+                - test
+                - -f
+                - /tmp/ready
+          command:
+            - sh
+            - -c
+            - |
+              sleep 60m &&
+              touch /tmp/ready &&
+              sleep infinity

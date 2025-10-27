@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-dns
+  labels:
+    app: custom-dns
+spec:
+  selector:
+    matchLabels:
+      app: custom-dns
+  template:
+    metadata:
+      name: custom-dns
+      labels:
+        app: custom-dns
+    spec:
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 93.184.215.14 # example.com
+      containers:
+        - image: curlimages/curl:8.8.0
+          name: container
+          command:
+            - sh
+            - -c
+            - "curl linkedin.com && echo 'App is running' && sleep infinity"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hardcoded-dns
+  labels:
+    app: hardcoded-dns
+spec:
+  selector:
+    matchLabels:
+      app: hardcoded-dns
+  template:
+    metadata:
+      labels:
+        app: hardcoded-dns
+    spec:
+      containers:
+        - image: carlosnunez/ll-ubuntu-broken-dns:2024.06.29
+          name: container
+          command:
+            - -c
+            - "curl linkedin.com && echo 'App is running' && sleep infinity"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: old-alpine-linux
+  labels:
+    app: old-alpine-linux
+spec:
+  selector:
+    matchLabels:
+      app: old-alpine-linux
+  template:
+    metadata:
+      labels:
+        app: old-alpine-linux
+    spec:
+      containers:
+        - image: alpine:3.10
+          name: container
+          command:
+            - sh
+            - -c
+            - "while true; do nslookup linkedin.com && sleep 1; done"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: working
+  labels:
+    app: working
+spec:
+  type: ClusterIP
+  ports:
+    - name: dummy
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: working
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: working
+  labels:
+    app: working
+spec:
+  selector:
+    matchLabels:
+      app: working
+  template:
+    metadata:
+      labels:
+        app: working
+    spec:
+      containers:
+        - image: curlimages/curl:8.8.0
+          name: container
+          command:
+            - sh
+            - -c
+            - |
+              pings_str=""
+              while true;
+              do
+                if ! curl -sS linkedin.com
+                then
+                  >&2 echo "ERROR: Can't reach linkedin.com"
+                  exit 1
+                fi
+                pings_str="${pings_str};"
+                pings="$(echo "$pings_str" | tr ';' '\n' | wc -l)"
+                >&2 echo "INFO: app is working (ping #$pings)"
+                sleep 1
+              done

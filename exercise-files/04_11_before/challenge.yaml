@@ -1,0 +1,132 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-router
+  labels:
+    app: app
+spec:
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - pathType: Exact
+            path: /
+            backend:
+              service:
+                name: app-a
+                port:
+                  number: 8080
+          - pathType: Exact
+            path: /about
+            backend:
+              service:
+                name: app-b
+                port:
+                  number: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-a
+  labels:
+    app: app
+spec:
+  selector:
+    component: app-a
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-a
+  labels:
+    app: app
+    component: app-a
+spec:
+  selector:
+    matchLabels:
+      component: app-a
+  template:
+    metadata:
+      name: app-a
+      labels:
+        app: app
+        component: app-a
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: container
+          ports:
+            - name: web
+              containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+            failureThreshold: 3
+            periodSeconds: 2
+          command:
+            - sh
+            - -c
+            - |
+              >&2 echo "INFO: Server started at $(date)"
+              while true
+              do nc -l -p 80 -q 1ms -c "echo 'HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 118\n\n<html><body>Hello, and thanks for visiting. <a href=\"/about/\">Click here</a> to complete the challenge.</body></html>'"
+              done
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-b
+  labels:
+    app: app
+    component: app-b
+spec:
+  selector:
+    component: app-b
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-b
+  labels:
+    app: app
+    component: app-b
+spec:
+  selector:
+    matchLabels:
+      component: app-b
+  template:
+    metadata:
+      name: app-b
+      labels:
+        app: app
+        component: app-b
+    spec:
+      containers:
+        - image: carlosnunez/ubuntu-with-netcat:noble
+          name: container
+          ports:
+            - name: web
+              containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+            failureThreshold: 3
+            periodSeconds: 2
+          command:
+            - sh
+            - -c
+            - |
+              >&2 echo "INFO: Server started at $(date)"
+              while true
+              do nc -l -p 80 -q 1ms -c "echo 'HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 90\n\n<html><body>Congratulations. You have successfully completed the challenge.</body></html>'"
+              done

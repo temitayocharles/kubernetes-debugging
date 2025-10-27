@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app
+  labels:
+    app: test-app
+spec:
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+        - name: container
+          image: bisybrox     # did I spell this right?
+          command:
+            - sh
+            - -c
+            - |
+              invalid-command &&
+                echo "You've almost completed the challenge. Keep going!" &&
+                sleep infinity
+        - name: container-2
+          image: busybox
+          readinessProbe:
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+            exec:
+              command:
+                - test
+                - -f
+                - /tmp/ready
+          command:
+            - sh
+            - -c
+            - |
+              sleep 30000000
+              touch /tmp/ready
+              echo "You've completed the challenge. Nice work!"
+              sleep infinity

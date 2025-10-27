@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app-1
+  labels:
+    app: test-app-1
+spec:
+  selector:
+    matchLabels:
+      app: test-app-1
+  template:
+    metadata:
+      name: test-app-1
+      labels:
+        app: test-app-1
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+          key: debugging.k8s.io/ready
+      containers:
+        - image: busybox
+          name: container
+          livenessProbe:
+            periodSeconds: 1
+            timeoutSeconds: 1
+            failureThreshold: 3
+            terminationGracePeriodSeconds: 1
+            exec:
+              command:
+                - test
+                - -f
+                - /tmp/ready
+          command:
+            - sh
+            - -c
+            - |
+              sleep 45 &&
+              touch /tmp/ready &&
+              sleep infinity
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app-2
+  labels:
+    app: test-app-2
+spec:
+  selector:
+    matchLabels:
+      app: test-app-2
+  template:
+    metadata:
+      name: test-app-2
+      labels:
+        app: test-app-2
+    spec:
+      containers:
+        - image: busybox
+          name: container
+          command:
+            - sh
+            - -c
+            - |
+              echo "Task completed successfully!"
+              exit 1
+              sleep infinity
