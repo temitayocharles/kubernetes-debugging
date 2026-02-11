@@ -1,6 +1,30 @@
 # Kubernetes Debugging Labs 
 
+
+## Start Here
+- Read [START_HERE.md](START_HERE.md) for the chronological playbook.
+
 This repo "Debugging Kubernetes" is a simulation of common problems and errors related to using kubernetes. Each scenario has a concise, step-by-step playbook to reproduce the issue, diagnose it, and apply a fix on macOS using kind.
+
+
+## Documentation Index
+- [INDEX.md](INDEX.md)
+- [SETUP-local.md](SETUP-local.md)
+- [scenarios/networking-and-ingress/04_01_dns_inside_pods.md](scenarios/networking-and-ingress/04_01_dns_inside_pods.md)
+- [scenarios/networking-and-ingress/04_04_pod_networking_and_networkpolicies.md](scenarios/networking-and-ingress/04_04_pod_networking_and_networkpolicies.md)
+- [scenarios/networking-and-ingress/04_06_services_unreachable.md](scenarios/networking-and-ingress/04_06_services_unreachable.md)
+- [scenarios/networking-and-ingress/04_07_ingress_issues_controller_service_pathType.md](scenarios/networking-and-ingress/04_07_ingress_issues_controller_service_pathType.md)
+- [scenarios/networking-and-ingress/04_10_challenge_flaky_web_app.md](scenarios/networking-and-ingress/04_10_challenge_flaky_web_app.md)
+- [scenarios/nodes-control-plane/00_setup_local_cluster.md](scenarios/nodes-control-plane/00_setup_local_cluster.md)
+- [scenarios/nodes-control-plane/05_03_kubeconfig_certs.md](scenarios/nodes-control-plane/05_03_kubeconfig_certs.md)
+- [scenarios/nodes-control-plane/05_08_nodes_kubelet_and_cni.md](scenarios/nodes-control-plane/05_08_nodes_kubelet_and_cni.md)
+- [scenarios/nodes-control-plane/05_12_finalizers_namespace.md](scenarios/nodes-control-plane/05_12_finalizers_namespace.md)
+- [scenarios/pods-and-deployments/03_01_pending-pods_taints-pvcs.md](scenarios/pods-and-deployments/03_01_pending-pods_taints-pvcs.md)
+- [scenarios/pods-and-deployments/03_04_imagepullbackoff.md](scenarios/pods-and-deployments/03_04_imagepullbackoff.md)
+- [scenarios/pods-and-deployments/03_07_crashloopbackoff_liveness.md](scenarios/pods-and-deployments/03_07_crashloopbackoff_liveness.md)
+- [scenarios/pods-and-deployments/03_09_readiness_probes.md](scenarios/pods-and-deployments/03_09_readiness_probes.md)
+- [scenarios/pods-and-deployments/03_10_slow_pods_hpa.md](scenarios/pods-and-deployments/03_10_slow_pods_hpa.md)
+- [scenarios/pods-and-deployments/03_11_challenge_troublemaking_deployment.md](scenarios/pods-and-deployments/03_11_challenge_troublemaking_deployment.md)
 
 ## Prerequisites (macOS zsh)
 
