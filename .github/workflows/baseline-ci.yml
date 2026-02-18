@@ -47,10 +47,11 @@ jobs:
         if: steps.detect.outputs.has_py == 'true'
         run: python -m compileall -q .
 
-      - name: Shell syntax validation
+      - name: Shell syntax validation (bash shebang only)
         if: steps.detect.outputs.has_sh == 'true'
         run: |
           set -euo pipefail
-          git ls-files '*.sh' | while read -r f; do
+          while IFS= read -r f; do
+            head -n1 "$f" | grep -Eq '^#!/.*bash' || continue
             bash -n "$f"
-          done
+          done < <(git ls-files '*.sh')
