@@ -10,40 +10,5 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install validator deps
-        run: python -m pip install --upgrade pip pyyaml
-      - name: Validate YAML/JSON (non-blocking parse report)
-        run: |
-          python - <<"PY"
-          import json
-          from pathlib import Path
-          import yaml
-
-          issues = []
-          for p in Path('.').rglob('*'):
-            if not p.is_file() or '.git' in p.parts:
-              continue
-            try:
-              if p.suffix in {'.yml', '.yaml'}:
-                with p.open('r', encoding='utf-8') as f:
-                  list(yaml.safe_load_all(f))
-              elif p.suffix == '.json':
-                with p.open('r', encoding='utf-8') as f:
-                  json.load(f)
-            except Exception as e:
-              issues.append(f"{p}: {e}")
-
-          if issues:
-            print('WARN: parse issues detected:')
-            for i in issues[:200]:
-              print('-', i)
-          print('validation complete')
-          PY
+  baseline:
+    uses: temitayocharles/shared-workflows/.github/workflows/baseline-reusable.yml@main
